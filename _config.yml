@@ -8,13 +8,13 @@ highlighter: rouge
 # Themes are encouraged to use these universal variables
 # so be sure to set them if your theme uses them.
 #
-title : simple site
+title : Personal Description
 author :
-  name : Karl Broman
-  email : kbroman@gmail.com
-  github : kbroman
-  twitter : kwbroman
-  feedburner : nil
+  name : Brandon Wood
+  email : b.wood@berkeley.edu
+  #github : kbroman
+  #twitter : kwbroman
+  #feedburner : nil
 
 # NOTE: Replacing this next line with your own URL
 production_url : https://wood-b.github.io/
