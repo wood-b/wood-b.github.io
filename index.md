@@ -8,7 +8,7 @@ I am a computational chemist at UC Berkeley finishing my Ph.D. in the spring of 
 
 
 ### Projects
-- Simulation and modeling of polymers: [Github](https://github.com/wood-b/dihedral_model)
+- Stocastic model for semiflexible polymers: [Github](https://github.com/wood-b/dihedral_model)
 - High-throughput quantum calculations: [GitHub](https://github.com/hackingmaterials/atomate)
 - Python package for molecules and materials: [GitHub](https://github.com/materialsproject/pymatgen/blob/master/pymatgen/io/qchem/inputs.py)
-- Machine Learning model for predicting the bulk modulus of materials: [Github](https://github.com/wood-b/elastic_tensor_ML)
+- Machine learning model for predicting the bulk modulus of materials: [Github](https://github.com/wood-b/elastic_tensor_ML)
