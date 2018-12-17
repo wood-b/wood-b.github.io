@@ -1,7 +1,5 @@
 ---
-layout: page
-title: Brandon Wood
-tagline: Computational Chemist
+permalink: /about/
 ---
 
 I am a computational chemist at UC Berkeley finishing my Ph.D. in the spring of 2019. As a Ph.D. student in Kristin Persson's group (founders of the [Materials Project](https://materialsproject.org)), my research focused on fundamental knowledge, and ultimately enhanced design, of conductive polymer materials. Moving forward, I am interested in accelerating the discovery and design of molecules and materials by leveraging recent developments in machine learning.
