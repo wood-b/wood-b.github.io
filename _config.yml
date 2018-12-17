@@ -1,3 +1,11 @@
+title: Bio
+author: Brandon Wood
+email : b.wood@berkeley.edu
+github : wood-b
+
+#try permalinks 
+permalink: /:categories/:year/:month/:day/:title
+
 plugins:
   - jekyll-relative-links
 relative_links:
