@@ -5,6 +5,7 @@ relative_links:
   collections: true
 include:
   - CONTRIBUTING.md
+  - index.md
   - README.md
   - LICENSE.md
   - COPYING.md
@@ -13,4 +14,4 @@ include:
   - ISSUE_TEMPLATE.md
   - PULL_REQUEST_TEMPLATE.md
 
-theme: jekyll-theme-midnight
+theme: jekyll-theme-minimal
