@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on </title>
+    <link>https://wood-b.github.io/tags/</link>
+    <description>Recent content in Tags on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018 Brandon Wood</copyright>
+    <lastBuildDate>Wed, 19 Dec 2018 11:28:58 -0800</lastBuildDate>
+    
+	<atom:link href="https://wood-b.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Conjugated Polymers</title>
+      <link>https://wood-b.github.io/tags/conjugated-polymers/</link>
+      <pubDate>Wed, 19 Dec 2018 11:28:58 -0800</pubDate>
+      
+      <guid>https://wood-b.github.io/tags/conjugated-polymers/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>elastic tensor</title>
+      <link>https://wood-b.github.io/tags/elastic-tensor/</link>
+      <pubDate>Wed, 19 Dec 2018 11:28:58 -0800</pubDate>
+      
+      <guid>https://wood-b.github.io/tags/elastic-tensor/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>high-throughput</title>
+      <link>https://wood-b.github.io/tags/high-throughput/</link>
+      <pubDate>Wed, 19 Dec 2018 14:15:49 -0800</pubDate>
+      
+      <guid>https://wood-b.github.io/tags/high-throughput/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>machine learning</title>
+      <link>https://wood-b.github.io/tags/machine-learning/</link>
+      <pubDate>Wed, 19 Dec 2018 11:28:58 -0800</pubDate>
+      
+      <guid>https://wood-b.github.io/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>machine-learning</title>
+      <link>https://wood-b.github.io/tags/machine-learning/</link>
+      <pubDate>Wed, 19 Dec 2018 11:28:58 -0800</pubDate>
+      
+      <guid>https://wood-b.github.io/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>open source software</title>
+      <link>https://wood-b.github.io/tags/open-source-software/</link>
+      <pubDate>Wed, 19 Dec 2018 14:15:49 -0800</pubDate>
+      
+      <guid>https://wood-b.github.io/tags/open-source-software/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

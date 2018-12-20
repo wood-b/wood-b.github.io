@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>open source software on </title>
+    <link>https://wood-b.github.io/tags/open-source-software/</link>
+    <description>Recent content in open source software on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018 Brandon Wood</copyright>
+    <lastBuildDate>Wed, 19 Dec 2018 14:15:49 -0800</lastBuildDate>
+    
+	<atom:link href="https://wood-b.github.io/tags/open-source-software/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>High-throughput Chemistry</title>
+      <link>https://wood-b.github.io/project/high-throughput-chemistry/</link>
+      <pubDate>Wed, 19 Dec 2018 14:15:49 -0800</pubDate>
+      
+      <guid>https://wood-b.github.io/project/high-throughput-chemistry/</guid>
+      <description>With the rise of modern high performance computers, it is possible to run quantum and classical simulations in automated high-throughput fashion. I have contributed to a number of open source repositories that enable high-throughput chemistry and materials science. The software stack includes: pymatgen, custodian, and atomate. Check out our atomate publication.</description>
+    </item>
+    
+  </channel>
+</rss>

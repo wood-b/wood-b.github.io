@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Publications on </title>
+    <link>https://wood-b.github.io/publication/</link>
+    <description>Recent content in Publications on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018 Brandon Wood</copyright>
+    <lastBuildDate>Sun, 01 Jan 2017 00:00:00 -0800</lastBuildDate>
+    
+	<atom:link href="https://wood-b.github.io/publication/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Elucidating Solvation Structures for Rational Design of Multivalent Electrolytes — A Review</title>
+      <link>https://wood-b.github.io/publication/elucidating-solvation-structures-for-rational-design-of-multivalent-electrolytes-a-review/</link>
+      <pubDate>Thu, 26 Apr 2018 00:00:00 -0700</pubDate>
+      
+      <guid>https://wood-b.github.io/publication/elucidating-solvation-structures-for-rational-design-of-multivalent-electrolytes-a-review/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>The Interplay between Salt Association and the Dielectric Properties of Low Permittivity Electrolytes: The Case of LiPF6 and LiAsF6 in Dimethyl Carbonate</title>
+      <link>https://wood-b.github.io/publication/the-interplay-between-salt-association-and-the-dielectric-properties-of-low-permittivity-electrolytes-the-case-of-lipf6-and-liasf6-in-dimethyl-carbonate/</link>
+      <pubDate>Wed, 20 Dec 2017 00:00:00 -0800</pubDate>
+      
+      <guid>https://wood-b.github.io/publication/the-interplay-between-salt-association-and-the-dielectric-properties-of-low-permittivity-electrolytes-the-case-of-lipf6-and-liasf6-in-dimethyl-carbonate/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Atomate: A High Level Interface to Generate, Execute, and Analyze Computational Materials Science Workflows</title>
+      <link>https://wood-b.github.io/publication/atomate-a-high-level-interface-to-generate-execute-and-analyze-computational-materials-science-workflows/</link>
+      <pubDate>Fri, 04 Aug 2017 00:00:00 -0700</pubDate>
+      
+      <guid>https://wood-b.github.io/publication/atomate-a-high-level-interface-to-generate-execute-and-analyze-computational-materials-science-workflows/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
