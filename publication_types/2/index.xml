@@ -7,10 +7,37 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2020 Brandon Wood</copyright>
-    <lastBuildDate>Thu, 26 Apr 2018 00:00:00 -0700</lastBuildDate>
+    <lastBuildDate>Wed, 12 Feb 2020 00:00:00 -0800</lastBuildDate>
     
 	<atom:link href="https://wood-b.github.io/publication_types/2/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Aromaticity as a Guide to Planarity in Conjugated Molecules and Polymers</title>
+      <link>https://wood-b.github.io/publication/aromaticity_as_a_guide_to_planarity_in_conjugated_molecules_and_polymers/</link>
+      <pubDate>Wed, 12 Feb 2020 00:00:00 -0800</pubDate>
+      
+      <guid>https://wood-b.github.io/publication/aromaticity_as_a_guide_to_planarity_in_conjugated_molecules_and_polymers/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Conformational Entropy as a Means to Control the Behavior of Poly (diketoenamine) Vitrimers In and Out of Equilibrium</title>
+      <link>https://wood-b.github.io/publication/conformational-entropy-vitrimers/</link>
+      <pubDate>Tue, 15 Oct 2019 00:00:00 -0700</pubDate>
+      
+      <guid>https://wood-b.github.io/publication/conformational-entropy-vitrimers/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ion Transport and the True Transference Number in Nonaqueous Polyelectrolyte Solutions for Lithium-Ion Batteries</title>
+      <link>https://wood-b.github.io/publication/ion-transport-polyelectrolyte-solutions/</link>
+      <pubDate>Fri, 14 Jun 2019 00:00:00 -0700</pubDate>
+      
+      <guid>https://wood-b.github.io/publication/ion-transport-polyelectrolyte-solutions/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Elucidating Solvation Structures for Rational Design of Multivalent Electrolytes — A Review</title>
