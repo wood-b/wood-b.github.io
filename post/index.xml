@@ -13,12 +13,14 @@
     
     
     <item>
-      <title>Active Learning on Molecular Systems with GraphDot, xTB, ASE, and scikit-learn</title>
-      <link>https://wood-b.github.io/post/active_learn_pe/</link>
-      <pubDate>Wed, 11 Mar 2020 22:10:34 -0700</pubDate>
+      <title>Active Learning Demo</title>
+      <link>https://wood-b.github.io/post/active-learning-demo/</link>
+      <pubDate>Fri, 10 Apr 2020 12:00:14 -0700</pubDate>
       
-      <guid>https://wood-b.github.io/post/active_learn_pe/</guid>
-      <description>Introduction Since the end of my PhD, I have been interested in coupling active learning with quantum calculations to explore configuration space in molecular systems. The goal of this post is to demonstrate active learning on a simple system and to put a few ideas out there for people to think about and expand on. Another reason I wanted to make this post is that I think it is ridiculously cool how seamlessly GraphDot/xTB/ASE can work together.</description>
+      <guid>https://wood-b.github.io/post/active-learning-demo/</guid>
+      <description>Active Learning on Molecular Systems with GraphDot, xTB, ASE, and scikit-learn Original Post: 3/11/2020
+Updated: 4/10/2020
+Introduction Since the end of my PhD (Aug 2019), I have been interested in combining active learning with quantum calculations to explore configuration space in molecular systems. The goal of this post is to explore active learning on a simple system and to put a few ideas out there for people to think about and expand on.</description>
     </item>
     
   </channel>

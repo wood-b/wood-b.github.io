@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 3.2.0">
+  <meta name="generator" content="Hugo 0.52" />
+  <meta name="author" content="Brandon Wood">
+
+  
+  
+  
+  
+    
+  
+  <meta name="description" content="Active Learning on Molecular Systems with GraphDot, xTB, ASE, and scikit-learn Original Post: 3/11/2020
+Updated: 4/10/2020
+Introduction Since the end of my PhD (Aug 2019), I have been interested in combining active learning with quantum calculations to explore configuration space in molecular systems. The goal of this post is to explore active learning on a simple system and to put a few ideas out there for people to think about and expand on.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://wood-b.github.io/post/active-learning-demo/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous">
+        
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+  
+
+  
+  <link rel="alternate" href="https://wood-b.github.io/index.xml" type="application/rss+xml" title="">
+  <link rel="feed" href="https://wood-b.github.io/index.xml" type="application/rss+xml" title="">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://wood-b.github.io/post/active-learning-demo/">
+
+  
+  
+  
+  
+    
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="og:site_name" content="">
+  <meta property="og:url" content="https://wood-b.github.io/post/active-learning-demo/">
+  <meta property="og:title" content="Active Learning Demo | ">
+  <meta property="og:description" content="Active Learning on Molecular Systems with GraphDot, xTB, ASE, and scikit-learn Original Post: 3/11/2020
+Updated: 4/10/2020
+Introduction Since the end of my PhD (Aug 2019), I have been interested in combining active learning with quantum calculations to explore configuration space in molecular systems. The goal of this post is to explore active learning on a simple system and to put a few ideas out there for people to think about and expand on."><meta property="og:image" content="https://wood-b.github.io/post/active-learning-demo/featured.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2020-04-10T12:00:14-07:00">
+  
+  <meta property="article:modified_time" content="2020-04-10T12:00:14-07:00">
+  
+
+  
+
+  
+
+  <title>Active Learning Demo | </title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/"></a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav ml-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#publications">
+            
+            <span>Publications</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/files/cv_website_feb2020.pdf">
+            
+            <span>CV</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="article-header d-xl-none">
+  <div class="featured-image" style="background-image: url('/post/active-learning-demo/featured_hu8f0b9e05b19aec9f0cc40148fcb05085_95323_800x0_resize_box_2.png');"></div>
+  
+</div>
+
+
+<div class="container-fluid split-header d-none d-xl-block">
+  <div class="row">
+    <div class="col-6">
+      <div class="split-header-content">
+        <h1 itemprop="name">Active Learning Demo</h1>
+
+        
+
+        
+
+<div class="article-metadata">
+
+  
+  
+  
+  <div>
+    <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+      <span itemprop="name">Brandon M. Wood</span>
+    </span>
+    
+  </div>
+  
+
+  <span class="article-date">
+    
+    <meta content="2020-04-10 12:00:14 -0700 PDT" itemprop="datePublished">
+    <time datetime="2020-04-10 12:00:14 -0700 PDT" itemprop="dateModified">
+      Apr 10, 2020
+    </time>
+  </span>
+  <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Brandon Wood">
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    21 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+
+</div>
+
+
+        
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Active%20Learning%20Demo&amp;url=https%3a%2f%2fwood-b.github.io%2fpost%2factive-learning-demo%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwood-b.github.io%2fpost%2factive-learning-demo%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwood-b.github.io%2fpost%2factive-learning-demo%2f&amp;title=Active%20Learning%20Demo"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwood-b.github.io%2fpost%2factive-learning-demo%2f&amp;title=Active%20Learning%20Demo"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Active%20Learning%20Demo&amp;body=https%3a%2f%2fwood-b.github.io%2fpost%2factive-learning-demo%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="split-header-image">
+        <img src="/post/active-learning-demo/featured_hu8f0b9e05b19aec9f0cc40148fcb05085_95323_680x500_fill_q90_box_left_2.png" itemprop="image" alt="">
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="article-container d-xl-none">
+  <h1 itemprop="name">Active Learning Demo</h1>
+
+  
+
+  
+
+<div class="article-metadata">
+
+  
+  
+  
+  <div>
+    <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+      <span itemprop="name">Brandon M. Wood</span>
+    </span>
+    
+  </div>
+  
+
+  <span class="article-date">
+    
+    <meta content="2020-04-10 12:00:14 -0700 PDT" itemprop="datePublished">
+    <time datetime="2020-04-10 12:00:14 -0700 PDT" itemprop="dateModified">
+      Apr 10, 2020
+    </time>
+  </span>
+  <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Brandon Wood">
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    21 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Active%20Learning%20Demo&amp;url=https%3a%2f%2fwood-b.github.io%2fpost%2factive-learning-demo%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwood-b.github.io%2fpost%2factive-learning-demo%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwood-b.github.io%2fpost%2factive-learning-demo%2f&amp;title=Active%20Learning%20Demo"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwood-b.github.io%2fpost%2factive-learning-demo%2f&amp;title=Active%20Learning%20Demo"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Active%20Learning%20Demo&amp;body=https%3a%2f%2fwood-b.github.io%2fpost%2factive-learning-demo%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+  
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<h1 id="active-learning-on-molecular-systems-with-graphdot-xtb-ase-and-scikit-learn">Active Learning on Molecular Systems with GraphDot, xTB, ASE, and scikit-learn</h1>
+
+<p>Original Post: 3/11/2020</p>
+
+<p>Updated: 4/10/2020</p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Since the end of my PhD (Aug 2019), I have been interested in combining active learning with quantum calculations to explore configuration space in molecular systems. The goal of this post is to explore active learning on a simple system and to put a few ideas out there for people to think about and expand on. The other reason I wanted to make this post is that I think it is really cool how easily GraphDot/xTB/ASE/scikit-learn can be used together, so I thought I would share by example.</p>
+
+<p>I want to thank <a href="https://crd.lbl.gov/departments/computational-science/ccmc/staff/alvarez-fellows/yu-hang-tang/" target="_blank">Yu-Hang Tang</a> for all the help with the graph kernel, none of this would have been possible otherwise. If you want to learn more about the graph kernel, check out this <a href="http://dx.doi.org/10.1063/1.5078640" target="_blank">publication</a>.</p>
+
+<p>If you have any questions or comments shoot me an email bwood@lbl.gov.</p>
+
+<h2 id="dependencies">Dependencies</h2>
+
+<p>All dependencies can be pip installed with the exception of xTB, which can now be install with <a href="https://github.com/grimme-lab/xtb" target="_blank">conda</a>, although I used a version I compiled. Additionally, the methods I used from GraphDot require a GPU.</p>
+
+<ul>
+<li><a href="https://graphdot.readthedocs.io/en/latest/" target="_blank">GraphDot</a></li>
+<li><a href="https://xtb-docs.readthedocs.io/en/latest/contents.html" target="_blank">xTB</a></li>
+<li><a href="https://wiki.fysik.dtu.dk/ase/index.html" target="_blank">ASE</a></li>
+<li>scikit-learn</li>
+<li>Numpy</li>
+<li>Matplotlib</li>
+<li>tqdm</li>
+</ul>
+
+<h1 id="conformations-of-polyethylene">Conformations of Polyethylene</h1>
+
+<p><img src="./pe_tor_rot.png" alt="png" /></p>
+
+<h2 id="description-of-the-system">Description of the system</h2>
+
+<p>The toy problem I chose to explore is approximating the energy functional of an ensemble of polyethylene chain conformations. I defined the problem as follows. All chains are made up of 3 monomers — 6 carbon atoms. The rationale for short chains is to keep the degrees of freedom manageable for example purposes. Each chain consists of three C-C-C-C torsion angles ($\phi$$_i$, $\phi$$_j$, $\phi$$_k$) and a conformation is defined as a unique set of the three torsion angles {$\phi$$_i$, $\phi$$_j$, $\phi$$_k$}. I discretized the torsion angle distribution to contain 36 states equally spaced by 10 degrees. The ensemble of conformations is generated by sampling over all of the discrete torsional configurations, so there are ~ $36^3$ conformations — some of these are not unique because of symmetry.</p>
+
+<h2 id="description-of-the-active-learning-algorithm">Description of the active learning algorithm</h2>
+
+<p><img src="./active_learn_scheme.png" alt="png" /></p>
+
+<p>The objective is to find a surrogate model for calculating the energy of a chain conformation. Generally speaking, an energy evaluation with density functional theory (DFT) or another level of quantum chemistry is computationally expensive, so if we can generate a reasonable energy prediction (or predict another property of interest) with a machine learning model it saves computational time and expands the systems we can study. In this example, I generate a graph representation of the different conformations using GraphDot and then use a graph kernel with scikit-learn’s Gaussian Process Regression (GPR) to predict energies. I could easily calculate all the conformer energies with xTB; however, if I wanted to use DFT or look at larger systems that would not be possible. As a result, I wanted to implement an active learning strategy. The active learning algorithm I employ is an iterative process where ~1000 conformations are predicted each step, and the 300 conformers with the largest prediction uncertainties are fed back into the training data for the next step. This procedure is intended to ensure that the model sees data that will maximally improve the model each step.</p>
+
+<h2 id="imports">Imports</h2>
+
+<pre><code class="language-python">import numpy as np
+import os
+import time
+from tqdm import tqdm
+</code></pre>
+
+<pre><code class="language-python">import xtb
+from xtb import GFN2
+
+import ase
+from ase.io import read, write
+from ase.units import Hartree
+from ase.optimize import BFGSLineSearch
+</code></pre>
+
+<pre><code class="language-python">from graphdot import Graph
+from graphdot.graph.adjacency import AtomicAdjacency
+from graphdot.kernel.molecular import Tang2019MolecularKernel
+from graphdot.kernel.basekernel import KroneckerDelta, SquareExponential, TensorProduct
+from graphdot.kernel.marginalized import MarginalizedGraphKernel
+</code></pre>
+
+<pre><code class="language-python">%matplotlib inline
+import matplotlib.pyplot as plt
+</code></pre>
+
+<pre><code class="language-python">from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
+</code></pre>
+
+<h2 id="generate-dataset-via-torsional-configurations">Generate dataset via torsional configurations</h2>
+
+<p>Torsion angles range from 0 to 360 degrees or depending on the convention from -180 to 180 degrees. For the purposes of this demo I am going to use 0 to 360 because it fits naturally with the convention ASE uses.</p>
+
+<pre><code class="language-python">torsion_angles = np.linspace(0.0, 350.0, num=36)
+</code></pre>
+
+<pre><code class="language-python">torsion_angles
+</code></pre>
+
+<pre><code>array([  0.,  10.,  20.,  30.,  40.,  50.,  60.,  70.,  80.,  90., 100.,
+       110., 120., 130., 140., 150., 160., 170., 180., 190., 200., 210.,
+       220., 230., 240., 250., 260., 270., 280., 290., 300., 310., 320.,
+       330., 340., 350.])
+</code></pre>
+
+<p>Generate an array of all combinations for 3 torsion angles ~46,000
+this includes all combinations, not all will be unique because of symmetry</p>
+
+<pre><code class="language-python">tor_combinations = np.zeros((46656, 3))
+</code></pre>
+
+<pre><code class="language-python">count = 0
+for i in torsion_angles:
+    for j in torsion_angles:
+        for k in torsion_angles:
+            tor_combinations[count] = [i, j, k]
+            count += 1
+</code></pre>
+
+<p>Read in the polyethylene molecule</p>
+
+<pre><code class="language-python">pe_mol = read(&quot;pe_n6.xyz&quot;, format=&quot;xyz&quot;)
+</code></pre>
+
+<p>Set the energy calculator</p>
+
+<pre><code class="language-python">pe_mol.set_calculator(GFN2())
+</code></pre>
+
+<p>Check how long it takes to calculate the energy</p>
+
+<pre><code class="language-python">%time pe_mol.get_potential_energy()
+</code></pre>
+
+<pre><code>CPU times: user 32.6 ms, sys: 8.23 ms, total: 40.9 ms
+Wall time: 25 ms
+
+-543.9429310420319
+</code></pre>
+
+<pre><code class="language-python">relax = BFGSLineSearch(pe_mol)
+</code></pre>
+
+<pre><code class="language-python">relax.run(fmax=0.05)
+</code></pre>
+
+<pre><code>                Step[ FC]     Time          Energy          fmax
+*Force-consistent energies used in optimization.
+BFGSLineSearch:    0[  0] 11:21:41     -543.942931*       0.7441
+BFGSLineSearch:    1[  2] 11:21:41     -544.038490*       0.5208
+BFGSLineSearch:    2[  4] 11:21:41     -544.057613*       0.1229
+BFGSLineSearch:    3[  6] 11:21:41     -544.058974*       0.0662
+BFGSLineSearch:    4[  8] 11:21:41     -544.059370*       0.0572
+BFGSLineSearch:    5[ 10] 11:21:41     -544.059850*       0.0372
+
+True
+</code></pre>
+
+<pre><code class="language-python">pe_mol.get_potential_energy()
+</code></pre>
+
+<pre><code>-544.0598501831128
+</code></pre>
+
+<h2 id="helper-functions-for-generating-data">Helper functions for generating data</h2>
+
+<pre><code class="language-python"># this function rotates all the torsion angles of the base molecule to the desired angles
+def rotate_all_torsions(base_mol, tor_atoms, tor_angles, rot_indices):
+    # copy base mol
+    rot_mol = base_mol.copy()
+    # loop through all the torsion angles in the conformer
+    for i, atom in enumerate(tor_atoms):
+        rot_mol.set_dihedral(a1=atom[0], a2=atom[1], a3=atom[2], a4=atom[3], 
+                             angle=tor_angles[i], indices=rot_indices[i])
+    return rot_mol
+</code></pre>
+
+<pre><code class="language-python"># this function generates all the rotated molecules and calculates their energy
+# additionally an energy cutoff of 1 eV is imposed
+def generate_data(base_mol, tors_list, tor_atoms, rot_indicies, sample_num):
+    mol_list = []
+    with tqdm(total=sample_num) as pbar:
+        for angles in tors_list:
+            rot_mol = rotate_all_torsions(base_mol, tor_atoms, angles, rot_indicies)
+            rot_mol.set_calculator(GFN2())
+            r_energy = rot_mol.get_potential_energy()
+            # energy cutoff of -543.0 eV
+            if r_energy &lt; -543.0:
+                mol_list.append(rot_mol)
+                pbar.update(1)
+            else:
+                continue
+            if len(mol_list) == sample_num:
+                break
+            else:
+                continue
+    return mol_list
+</code></pre>
+
+<h2 id="specify-atoms-involved-in-each-torsion-angle">Specify atoms involved in each torsion angle</h2>
+
+<pre><code class="language-python"># these are specific for this particular molecule and xyz file ordering
+pe_n6_tor_atoms = [[0, 1, 5, 8], [1, 5, 8, 11], [5, 8, 11, 14]]
+</code></pre>
+
+<pre><code class="language-python"># these are specific for this particular molecule and xyz file ordering
+pe_n6_tor_indices=[[8,9,10,11,12,13,14,15,16,17,18,19], [11,12,13,14,15,16,17,18,19], [14,15,16,17,18,19]]
+</code></pre>
+
+<h2 id="generate-and-write-data">Generate and write data</h2>
+
+<pre><code class="language-python"># shuffle torsion combinations
+random_tors = np.copy(tor_combinations)
+np.random.shuffle(random_tors)
+</code></pre>
+
+<pre><code class="language-python"># %time mol_list = generate_data(pe_mol, random_tors, pe_n6_tor_atoms, pe_n6_tor_indices, 13000)
+</code></pre>
+
+<pre><code class="language-python"># this took 6 mins to run
+</code></pre>
+
+<pre><code class="language-python"># write all 13k ase atom objects into an xyz file
+# write(&quot;./data/pe_13k_dataset.xyz&quot;, images=mol_list, format=&quot;xyz&quot;)
+</code></pre>
+
+<p><strong>Comment on calculating all the energies at once</strong>: Ideally, I would calculate energies on the fly in the active learning loop; however, for simplicity and because of the energy cutoff I am using I did everything at once. If I had done energy calculations in the active learning loop I would have saved myself 7000 energy evaluations — which can save a substantial amount of computational time depending on the method used.</p>
+
+<h2 id="read-molecule-data-and-generate-graphs">Read molecule data and generate graphs</h2>
+
+<pre><code class="language-python">%time mol_list = read(&quot;./data/pe_13k_dataset.xyz&quot;, index=&quot;:&quot;, format=&quot;xyz&quot;)
+</code></pre>
+
+<pre><code>CPU times: user 5.53 s, sys: 259 ms, total: 5.78 s
+Wall time: 5.77 s
+</code></pre>
+
+<pre><code class="language-python"># parameter for generating graphs
+adj = AtomicAdjacency(shape='tent2', zoom=2.0)
+</code></pre>
+
+<pre><code class="language-python"># this function gets the input graphs and target energies
+def get_xy_data(mols, adj):
+    # shuffle the mols again
+    random_mols = np.copy(mols)
+    np.random.shuffle(random_mols)
+    energy_array = np.array([mol.get_potential_energy() for mol in mols])
+    graph_array = np.array([Graph.from_ase(mol, adjacency=adj) for mol in mols])
+    return graph_array, energy_array
+</code></pre>
+
+<pre><code class="language-python">%time graphs, energies = get_xy_data(mol_list, adj)
+</code></pre>
+
+<pre><code>CPU times: user 47.3 s, sys: 367 ms, total: 47.6 s
+Wall time: 47.6 s
+</code></pre>
+
+<h2 id="define-the-graph-kernel">Define the graph kernel</h2>
+
+<pre><code class="language-python">mol_kernel = Tang2019MolecularKernel(edge_length_scale=0.02, stopping_probability=0.01)
+</code></pre>
+
+<p>In order to use scikit-learn&rsquo;s GPR we need to define a MarginalizedGraphKernel object. The kernel defined below is essentially the same as the Tang2019MolecularKernel. I double check that assumption below.</p>
+
+<pre><code class="language-python">kernel = MarginalizedGraphKernel(node_kernel=TensorProduct(element=KroneckerDelta(0.2)), 
+                                 edge_kernel=TensorProduct(length=SquareExponential(0.02)), 
+                                 q=0.01)
+</code></pre>
+
+<h2 id="check-graphs-and-visualize-similarity-matrix">Check graphs and visualize similarity matrix</h2>
+
+<pre><code class="language-python">try_graphs = graphs[:500]
+</code></pre>
+
+<pre><code class="language-python">try_energies = energies[:500]
+</code></pre>
+
+<pre><code class="language-python">R_mol = mol_kernel(try_graphs, lmin=1).astype(np.float)
+</code></pre>
+
+<pre><code class="language-python">D_mol = R_mol.diagonal()**-0.5
+</code></pre>
+
+<pre><code class="language-python">K_mol = D_mol[:, None] * R_mol * D_mol[None, :]
+</code></pre>
+
+<pre><code class="language-python"># visualize the similarity matrix
+plt.imshow(K_mol)
+</code></pre>
+
+<pre><code>&lt;matplotlib.image.AxesImage at 0x2aab24d429d0&gt;
+</code></pre>
+
+<p><img src="./active_learning_demo_7_write_files_60_1.png" alt="png" /></p>
+
+<pre><code class="language-python">K_mol.max()
+</code></pre>
+
+<pre><code>1.000000173664869
+</code></pre>
+
+<pre><code class="language-python">K_mol.min()
+</code></pre>
+
+<pre><code>0.8706799071173481
+</code></pre>
+
+<pre><code class="language-python">R = kernel(try_graphs, lmin=1).astype(np.float)
+</code></pre>
+
+<pre><code class="language-python">D = R.diagonal()**-0.5
+</code></pre>
+
+<pre><code class="language-python">K = D[:, None] * R * D[None, :]
+</code></pre>
+
+<pre><code class="language-python"># visualize the similarity matrix
+plt.imshow(K)
+</code></pre>
+
+<pre><code>&lt;matplotlib.image.AxesImage at 0x2aab24de3d10&gt;
+</code></pre>
+
+<p><img src="./active_learning_demo_7_write_files_66_1.png" alt="png" /></p>
+
+<p>The yellow diagonal represents when conformers are compared to themselves</p>
+
+<pre><code class="language-python">K.max()
+</code></pre>
+
+<pre><code>1.000000249324106
+</code></pre>
+
+<pre><code class="language-python">K.min()
+</code></pre>
+
+<pre><code>0.8706799071173481
+</code></pre>
+
+<p>The minimum similarity is fairly high, which isn&rsquo;t that surprising considering I am comparing the same molecule just with different torsional rotations.</p>
+
+<h2 id="calculate-a-specific-torsion-potential-for-benchmarking">Calculate a specific torsion potential for benchmarking</h2>
+
+<p>To track how the model improves at each step, I generate the inputs and targets for a specific torsion potential to benchmark against. Arbitrarily, I chose the central torsion angle $\phi$$_j$, leaving $\phi$$_i$ and $\phi$$_k$ fixed. In the future, it would be nice to guarantee these benchmarking data points were held out of the training set, right now, they may or may not be included.</p>
+
+<pre><code class="language-python">def get_torsion_pot(base_mol, tor_atoms, tor_angles, rot_indices, adj):
+    tor_graphs = []
+    tor_energies = []
+    for angle in tor_angles:
+        rot_mol = rotate_all_torsions(base_mol, tor_atoms, [angle], rot_indices)
+        rot_mol.set_calculator(GFN2())
+        tor_energies.append(rot_mol.get_potential_energy())
+        tor_graphs.append(Graph.from_ase(rot_mol, adjacency=adj))
+    return tor_energies, tor_graphs
+</code></pre>
+
+<pre><code class="language-python"># these are specific for this particular molecule and xyz file ordering
+pe_t2_tor_atoms = [[1, 5, 8, 11]]
+</code></pre>
+
+<pre><code class="language-python"># these are specific for this particular molecule and xyz file ordering
+pe_t2_tor_indices=[[11,12,13,14,15,16,17,18,19]]
+</code></pre>
+
+<pre><code class="language-python">tor_pot_angles = np.linspace(0.0, 360.0, num=37)
+</code></pre>
+
+<pre><code class="language-python">tor_pot_sp_energies, tor_pot_graphs = get_torsion_pot(pe_mol, pe_t2_tor_atoms, tor_pot_angles, pe_t2_tor_indices, adj)
+</code></pre>
+
+<h2 id="active-learning-object">Active learning object</h2>
+
+<p>This is a simple class to help organize the active learning loop. ActiveGPR initializes a scikit-learn GPR model and has train, explore, updata_data, and calc_metrics methods.</p>
+
+<pre><code class="language-python">class ActiveGPR():
+    def __init__(self, kernel, X_train, y_train, X_val, y_val, X_tor_pot):
+        self.X_train = X_train
+        self.y_train = y_train
+        self.X_val = X_val
+        self.y_val = y_val
+        self.X_tor_pot = X_tor_pot
+        self.uncertain = None
+        # the default alpha value needs to be adjusted and 
+        # normalize y is turned on because our energies do not have a mean of zero
+        self.gpr = GaussianProcessRegressor(kernel=kernel, optimizer=None, alpha=0.02, normalize_y=True)
+        self.metrics = {&quot;step&quot;: [], &quot;rmse&quot;: [], &quot;mae&quot;: [], &quot;r2&quot;: []}
+        self.pred_pot = []
+        self.step = 0
+        
+    def train(self):
+        self.gpr.fit(self.X_train, self.y_train);
+        self.calc_metrics(self.X_val, self.y_val)
+        self.pred_pot.append(self.gpr.predict(self.X_tor_pot, return_std=True))
+        self.step += 1
+    
+    def explore(self, X_new, sample_num=300):
+        y_pred, y_std = self.gpr.predict(X_new, return_std=True)
+        # np.argsort sorts from min to max so selecting from the end of array gives
+        # the max uncertainty
+        uncertain_indexes = np.argsort(y_std)
+        self.uncertain = uncertain_indexes[(len(uncertain_indexes) - sample_num):]
+
+    def update_data(self, X, y):
+        X_new = np.array(X)[self.uncertain]
+        y_new = np.array(y)[self.uncertain]
+        X_train = np.concatenate((self.X_train, X_new), axis=0)
+        y_train = np.concatenate((self.y_train, y_new), axis=0)
+        # shuffle data
+        shuffle_ind = np.arange(len(X_train))
+        np.random.shuffle(shuffle_ind)
+        self.X_train = X_train[shuffle_ind]
+        self.y_train = y_train[shuffle_ind]
+        
+    def calc_metrics(self, X, y):
+        y_pred = self.gpr.predict(X)
+        r2 = r2_score(y, y_pred)
+        rmse = mean_squared_error(y, y_pred, squared=False) 
+        mae = mean_absolute_error(y, y_pred)
+        self.metrics[&quot;rmse&quot;].append(rmse)
+        self.metrics[&quot;mae&quot;].append(mae)
+        self.metrics[&quot;r2&quot;].append(r2)
+</code></pre>
+
+<h2 id="active-learning-loop">Active learning loop</h2>
+
+<pre><code class="language-python"># define train, val, and test sets
+def train_val_test_split(energies, graphs, val_size, test_size, initial_size, active_size):
+    X_test = graphs[:test_size]
+    y_test = energies[:test_size]
+    X_val = graphs[test_size:(test_size + val_size)]
+    y_val = energies[test_size:(test_size + val_size)]
+    # returns the train set
+    train_size = int(len(energies) - (test_size + val_size))
+    splits = np.arange(initial_size, train_size, active_size)
+    X_train_set = np.split(graphs[(test_size + val_size):], splits, axis=0)
+    y_train_set = np.split(energies[(test_size + val_size):], splits, axis=0)
+    return X_train_set, y_train_set, X_val, y_val, X_test, y_test
+</code></pre>
+
+<pre><code class="language-python">X_train, y_train, X_val, y_val, X_test, y_test = train_val_test_split(energies, graphs, 1000, 1000, 1000, 1000)
+</code></pre>
+
+<pre><code class="language-python">pe_gpr = ActiveGPR(kernel, X_train[0], y_train[0], X_val, y_val, tor_pot_graphs)
+</code></pre>
+
+<pre><code class="language-python"># active learning loop
+active_steps = range(0, 11)
+for step in active_steps:
+    s_time = time.perf_counter()
+    print(&quot;Learning Step: {s}&quot;.format(s=pe_gpr.step))
+    print(&quot;Training Data Size: {d}&quot;.format(d=len(pe_gpr.X_train)))
+    
+    pe_gpr.train()
+    #X_new, y_new = generate_data(pe_mol, train_tor_list[step + 1], pe_n6_tor_atoms, pe_n6_tor_indices, adj, 1000)
+    if step != len(active_steps) - 1:
+        X_new = X_train[step + 1]
+        y_new = y_train[step + 1]
+        pe_gpr.explore(X_new)
+        pe_gpr.update_data(X_new, y_new)
+    
+    e_time = time.perf_counter()
+    
+    print(&quot;MAE: {mae:0.3f}&quot;.format(mae=pe_gpr.metrics[&quot;mae&quot;][step]))
+    print(&quot;RMSE: {rmse:0.3f}&quot;.format(rmse=pe_gpr.metrics[&quot;rmse&quot;][step]))
+    print(&quot;R-squared: {r2:0.5f}&quot;.format(r2=pe_gpr.metrics[&quot;r2&quot;][step]))
+    print(&quot;Step Time(s): {t:0.2f}&quot;.format(t=(e_time - s_time)))
+    print(&quot;---------- End of Step ----------&quot;)
+</code></pre>
+
+<pre><code>Learning Step: 0
+Training Data Size: 1000
+      0.5 ms on generating jobs
+      0.2 ms on creating output buffer
+      0.7 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      8.9 ms on code generation
+    190.7 ms on JIT
+      1.1 ms on calculating launch configuration
+      3.8 ms on GPU kernel execution
+    205.7 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+      0.8 ms on generating jobs
+      0.3 ms on creating output buffer
+      7.5 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+     15.8 ms on code generation
+    179.1 ms on JIT
+      2.3 ms on calculating launch configuration
+      5.1 ms on GPU kernel execution
+    210.3 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.018
+RMSE: 0.029
+R-squared: 0.98452
+Step Time(s): 13.47
+---------- End of Step ----------
+Learning Step: 1
+Training Data Size: 1300
+      0.5 ms on generating jobs
+      0.3 ms on creating output buffer
+      0.7 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      8.9 ms on code generation
+    192.6 ms on JIT
+      0.5 ms on calculating launch configuration
+      2.1 ms on GPU kernel execution
+    205.1 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+      0.5 ms on generating jobs
+      0.3 ms on creating output buffer
+     13.5 ms on transferring graphs to GPU
+      0.2 ms on allocate global job counter
+     12.2 ms on code generation
+    189.0 ms on JIT
+      2.6 ms on calculating launch configuration
+      5.0 ms on GPU kernel execution
+    222.8 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.014
+RMSE: 0.022
+R-squared: 0.99173
+Step Time(s): 16.96
+---------- End of Step ----------
+Learning Step: 2
+Training Data Size: 1600
+      0.5 ms on generating jobs
+      0.3 ms on creating output buffer
+      0.7 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      8.7 ms on code generation
+    188.6 ms on JIT
+      0.5 ms on calculating launch configuration
+      1.7 ms on GPU kernel execution
+    200.6 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+      0.6 ms on generating jobs
+      0.3 ms on creating output buffer
+     12.7 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+     12.5 ms on code generation
+    186.0 ms on JIT
+      2.1 ms on calculating launch configuration
+      5.2 ms on GPU kernel execution
+    219.0 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.011
+RMSE: 0.017
+R-squared: 0.99502
+Step Time(s): 22.28
+---------- End of Step ----------
+Learning Step: 3
+Training Data Size: 1900
+      0.5 ms on generating jobs
+      0.3 ms on creating output buffer
+      0.7 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      8.8 ms on code generation
+    191.2 ms on JIT
+      0.5 ms on calculating launch configuration
+      1.9 ms on GPU kernel execution
+    203.3 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+      0.6 ms on generating jobs
+      0.3 ms on creating output buffer
+     15.4 ms on transferring graphs to GPU
+      0.3 ms on allocate global job counter
+     13.5 ms on code generation
+    186.4 ms on JIT
+      3.1 ms on calculating launch configuration
+      5.6 ms on GPU kernel execution
+    224.6 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.010
+RMSE: 0.015
+R-squared: 0.99611
+Step Time(s): 28.16
+---------- End of Step ----------
+Learning Step: 4
+Training Data Size: 2200
+      0.5 ms on generating jobs
+      0.3 ms on creating output buffer
+      0.8 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      9.0 ms on code generation
+    187.0 ms on JIT
+      0.5 ms on calculating launch configuration
+      1.8 ms on GPU kernel execution
+    199.5 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+      0.5 ms on generating jobs
+      0.2 ms on creating output buffer
+     12.6 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+     12.4 ms on code generation
+    188.6 ms on JIT
+      2.3 ms on calculating launch configuration
+      5.3 ms on GPU kernel execution
+    221.6 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.009
+RMSE: 0.013
+R-squared: 0.99690
+Step Time(s): 34.71
+---------- End of Step ----------
+Learning Step: 5
+Training Data Size: 2500
+      0.5 ms on generating jobs
+      0.4 ms on creating output buffer
+      0.7 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      8.7 ms on code generation
+    183.8 ms on JIT
+      0.5 ms on calculating launch configuration
+      1.8 ms on GPU kernel execution
+    195.8 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+      0.6 ms on generating jobs
+      0.2 ms on creating output buffer
+     13.4 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+     12.2 ms on code generation
+    155.7 ms on JIT
+      2.3 ms on calculating launch configuration
+      5.2 ms on GPU kernel execution
+    189.2 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.008
+RMSE: 0.012
+R-squared: 0.99732
+Step Time(s): 42.01
+---------- End of Step ----------
+Learning Step: 6
+Training Data Size: 2800
+      0.5 ms on generating jobs
+      0.3 ms on creating output buffer
+      0.7 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      8.6 ms on code generation
+    182.4 ms on JIT
+      0.5 ms on calculating launch configuration
+      1.7 ms on GPU kernel execution
+    194.2 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+      0.5 ms on generating jobs
+      0.3 ms on creating output buffer
+     13.1 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+     12.3 ms on code generation
+    186.8 ms on JIT
+      2.3 ms on calculating launch configuration
+      5.4 ms on GPU kernel execution
+    220.4 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.007
+RMSE: 0.011
+R-squared: 0.99783
+Step Time(s): 50.00
+---------- End of Step ----------
+Learning Step: 7
+Training Data Size: 3100
+      0.6 ms on generating jobs
+      0.4 ms on creating output buffer
+      0.8 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      9.0 ms on code generation
+    172.8 ms on JIT
+      0.5 ms on calculating launch configuration
+      1.7 ms on GPU kernel execution
+    185.2 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+      0.6 ms on generating jobs
+      0.3 ms on creating output buffer
+     13.9 ms on transferring graphs to GPU
+      0.2 ms on allocate global job counter
+     13.2 ms on code generation
+    190.5 ms on JIT
+      2.2 ms on calculating launch configuration
+      5.0 ms on GPU kernel execution
+    225.4 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.007
+RMSE: 0.010
+R-squared: 0.99812
+Step Time(s): 58.98
+---------- End of Step ----------
+Learning Step: 8
+Training Data Size: 3400
+      0.6 ms on generating jobs
+      0.3 ms on creating output buffer
+      0.8 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      8.7 ms on code generation
+    173.3 ms on JIT
+      0.5 ms on calculating launch configuration
+      1.8 ms on GPU kernel execution
+    185.4 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+      0.5 ms on generating jobs
+      0.3 ms on creating output buffer
+     14.1 ms on transferring graphs to GPU
+      0.2 ms on allocate global job counter
+     12.6 ms on code generation
+    188.5 ms on JIT
+      2.3 ms on calculating launch configuration
+      5.2 ms on GPU kernel execution
+    223.3 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.007
+RMSE: 0.009
+R-squared: 0.99849
+Step Time(s): 68.16
+---------- End of Step ----------
+Learning Step: 9
+Training Data Size: 3700
+      0.5 ms on generating jobs
+      0.4 ms on creating output buffer
+      0.7 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      8.8 ms on code generation
+    166.4 ms on JIT
+      0.5 ms on calculating launch configuration
+      1.8 ms on GPU kernel execution
+    178.5 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+      0.8 ms on generating jobs
+      0.3 ms on creating output buffer
+     13.6 ms on transferring graphs to GPU
+      0.2 ms on allocate global job counter
+     17.0 ms on code generation
+    190.8 ms on JIT
+      2.4 ms on calculating launch configuration
+      5.0 ms on GPU kernel execution
+    229.4 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.006
+RMSE: 0.009
+R-squared: 0.99859
+Step Time(s): 77.91
+---------- End of Step ----------
+Learning Step: 10
+Training Data Size: 4000
+      0.5 ms on generating jobs
+      0.5 ms on creating output buffer
+      0.8 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      8.9 ms on code generation
+    163.4 ms on JIT
+      0.5 ms on calculating launch configuration
+      1.7 ms on GPU kernel execution
+    175.7 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+MAE: 0.006
+RMSE: 0.008
+R-squared: 0.99879
+Step Time(s): 73.67
+---------- End of Step ----------
+</code></pre>
+
+<h2 id="plot-validation-mae-and-rmse">Plot Validation MAE and RMSE</h2>
+
+<pre><code class="language-python">fig = plt.figure()
+ax = plt.subplot(111)
+ax.plot(range(0,11), pe_gpr.metrics[&quot;mae&quot;])
+ax.set_xlabel(&quot;Active Learning Step&quot;, fontsize=15)
+ax.set_ylabel(&quot;MAE\n(eV)&quot;, rotation=0, labelpad=30, fontsize=15)
+#ax.set_ylim(0.00, 0.14)
+ax.spines[&quot;right&quot;].set_visible(False)
+ax.spines[&quot;top&quot;].set_visible(False)
+#plt.title(&quot;&quot;, fontsize=15)
+#ax.legend([], frameon=False)
+</code></pre>
+
+<p><img src="./active_learning_demo_7_write_files_87_0.png" alt="png" /></p>
+
+<pre><code class="language-python">fig = plt.figure()
+ax = plt.subplot(111)
+ax.plot(range(0,11), pe_gpr.metrics[&quot;rmse&quot;], c=&quot;C1&quot;)
+ax.set_xlabel(&quot;Active Learning Step&quot;, fontsize=15)
+ax.set_ylabel(&quot;RMSE\n(eV)&quot;, rotation=0, labelpad=30, fontsize=15)
+#ax.set_ylim(0.00, 0.14)
+ax.spines[&quot;right&quot;].set_visible(False)
+ax.spines[&quot;top&quot;].set_visible(False)
+#plt.title(&quot;&quot;, fontsize=15)
+#ax.legend([], frameon=False)
+</code></pre>
+
+<p><img src="./active_learning_demo_7_write_files_88_0.png" alt="png" /></p>
+
+<h2 id="test-mae-and-rmse">Test MAE and RMSE</h2>
+
+<pre><code class="language-python">pe_gpr.calc_metrics(X_test, y_test)
+</code></pre>
+
+<pre><code class="language-python">print(&quot;MAE: {mae:0.3f}&quot;.format(mae=pe_gpr.metrics[&quot;mae&quot;][-1]))
+print(&quot;RMSE: {rmse:0.3f}&quot;.format(rmse=pe_gpr.metrics[&quot;rmse&quot;][-1]))
+print(&quot;R-squared: {r2:0.5f}&quot;.format(r2=pe_gpr.metrics[&quot;r2&quot;][-1]))
+</code></pre>
+
+<pre><code>MAE: 0.006
+RMSE: 0.008
+R-squared: 0.99888
+</code></pre>
+
+<p>The final MAE and RMSE values are encouraging. For reference, chemical accuracy — the requirement to make useful chemical predictions — is generally considered to be 1 kcal/mol or ~ 0.04 eV. The final MAE value of 0.006 eV is well within that range, which is great, but there are a few caveats. For one, I used an energy cutoff of 1 eV so that limited the overall energy distribution. It would be interesting to compare my results to randomly guessing energy values within the 1 eV window. Additionally, torsional energy barriers can be low (&lt; 0.025 eV), as a result we would hope that we could resolve those features in the potential energy surface.</p>
+
+<p><strong>Comment on the coefficient of determination ($R^2$):</strong> The interpretation of $R^2$ in this context is not entirely clear to me, but it says something about the amount of variance accounted for by the GPR model. It also tells us that our model is better than a model that always predicts the mean value of y regardless of the input features ($R^2$ = 0). <strong>TL;DR</strong> $R^2$ values increase with each active learning step indicating the model is improving.</p>
+
+<h2 id="predicting-torsion-potentials">Predicting torsion potentials</h2>
+
+<pre><code class="language-python"># torsion potentials are displayed using relative energies
+rel_sp_energies = np.array(tor_pot_sp_energies) - min(tor_pot_sp_energies)
+</code></pre>
+
+<pre><code class="language-python">rel_tor_predict = [array[0] - min(array[0]) for array in pe_gpr.pred_pot]
+</code></pre>
+
+<pre><code class="language-python"># propagate the error (energy – min(energy)) 
+tor_std_prop = []
+for array in pe_gpr.pred_pot:
+    min_index = np.argmin(array[0])
+    err_prop = np.sqrt(np.power(array[1], 2) + np.power(array[1][min_index], 2))
+    tor_std_prop.append(err_prop)
+</code></pre>
+
+<pre><code class="language-python">def tor_pot_plot(rel_energy, rel_predict, std, color, ylim=(-0.2, 0.45)):
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    ax.plot(tor_pot_angles, rel_energy)
+    ax.plot(tor_pot_angles, rel_predict, &quot;o&quot;, c=color)
+    #ax.errorbar(tor_pot_angles, rel_predict, yerr=std, fmt=&quot;o&quot;, c=color)
+    ax.fill_between(tor_pot_angles, rel_predict - std, rel_predict + std, alpha=0.125)
+    ax.set_xlabel(r&quot;Torsion Angle ($\degree$)&quot;, fontsize=15)
+    ax.set_ylabel(&quot;Relative\nEnergy (eV)&quot;, rotation=0, labelpad=50, fontsize=15)
+    ax.set_ylim(ylim)
+    ax.set_yticks([0.00, 0.15, 0.35])
+    ax.set_xticks([0, 180, 360])
+    ax.spines[&quot;right&quot;].set_visible(False)
+    ax.spines[&quot;top&quot;].set_visible(False)
+    ax.legend([&quot;True&quot;, &quot;Predict&quot;, &quot;Predict Uncertainty&quot;], loc=&quot;upper right&quot;, bbox_to_anchor=(1.4 ,1), frameon=False)
+    return fig.show()
+</code></pre>
+
+<h3 id="torsion-potential-after-initial-training">Torsion potential after initial training</h3>
+
+<pre><code class="language-python">tor_pot_plot(rel_sp_energies, rel_tor_predict[0], tor_std_prop[0], &quot;C6&quot;)
+</code></pre>
+
+<p><img src="./active_learning_demo_7_write_files_100_0.png" alt="png" /></p>
+
+<h3 id="torsion-potential-after-step-5">Torsion potential after step 5</h3>
+
+<pre><code class="language-python">tor_pot_plot(rel_sp_energies, rel_tor_predict[5], tor_std_prop[5], &quot;C4&quot;)
+</code></pre>
+
+<p><img src="./active_learning_demo_7_write_files_102_0.png" alt="png" /></p>
+
+<h3 id="torsion-potential-after-step-10">Torsion potential after step 10</h3>
+
+<pre><code class="language-python">tor_pot_plot(rel_sp_energies, rel_tor_predict[10], tor_std_prop[10], &quot;C1&quot;)
+</code></pre>
+
+<p><img src="./active_learning_demo_7_write_files_104_0.png" alt="png" /></p>
+
+<p><strong>Comment on the torsion potential data</strong>: It is possible that the model saw some of these points during training.</p>
+
+<h2 id="predicting-relaxed-torsion-potentials">Predicting relaxed torsion potentials</h2>
+
+<p>All the previous data points are single point energies, meaning that I took the initial relaxed structured, rotated the torsion angles, and calculated the energies without doing another relaxation step. Generally, when calculating a torsion potential, I would constrain the torsion angle of interest and do another relaxation. It turns out this is currently not possible with the xTB/ASE combination, but it is very simple to in xTB without the ASE interface. As a result, I read in the files from xTB. The relaxed molecules are guaranteed</p>
+
+<pre><code class="language-python"># read in the relaxed molecules
+relax_tor_mols = read(&quot;./xtbscan.log&quot;, index=&quot;:&quot;, format=&quot;xyz&quot;)
+</code></pre>
+
+<pre><code class="language-python">relax_tor_graphs = [Graph.from_ase(mol, adjacency=adj) for mol in relax_tor_mols]
+</code></pre>
+
+<pre><code class="language-python"># read in the energies
+relax_tor_ev_energies = []
+with open(&quot;./xtbscan.log&quot;) as file:
+    for i, line in enumerate(file):
+        if &quot;SCF done&quot; in line:
+            # energies are in Hatrees
+            tor_ha_energy = float(line.split()[2])
+            relax_tor_ev_energies.append(tor_ha_energy * 27.211386245988)  
+</code></pre>
+
+<pre><code class="language-python"># relative energies
+rel_relax_tor_energies = np.array(relax_tor_ev_energies) - min(relax_tor_ev_energies)
+</code></pre>
+
+<pre><code class="language-python">relax_tor_predict, relax_tor_std = pe_gpr.gpr.predict(relax_tor_graphs, return_std=True)
+</code></pre>
+
+<pre><code>      0.5 ms on generating jobs
+      0.4 ms on creating output buffer
+      0.8 ms on transferring graphs to GPU
+      0.1 ms on allocate global job counter
+      8.9 ms on code generation
+    193.2 ms on JIT
+      0.4 ms on calculating launch configuration
+      2.0 ms on GPU kernel execution
+    205.6 ms on calling GPU kernel (overall)
+      0.0 ms on collecting result
+</code></pre>
+
+<pre><code class="language-python"># relative predicted energies
+rel_relax_tor_predict = np.array(relax_tor_predict) - min(relax_tor_predict)
+</code></pre>
+
+<pre><code class="language-python"># propagate the error (energy – min(energy))
+min_i = np.argmin(rel_relax_tor_energies)
+relax_tor_std_prop = np.sqrt(np.power(relax_tor_std, 2) + np.power(relax_tor_std[min_i], 2))
+</code></pre>
+
+<pre><code class="language-python">tor_pot_plot(rel_relax_tor_energies, rel_relax_tor_predict, relax_tor_std_prop, &quot;C2&quot;, ylim=(-0.1, 0.35))
+</code></pre>
+
+<p><img src="./active_learning_demo_7_write_files_115_0.png" alt="png" /></p>
+
+<p>Predicting the energy of relaxed structures is not fantastic but the shape of the potential is roughly correct, and the good news is that the model knows what it doesn’t know. The prediction uncertainty for these is high compared to the previous torsion potential predictions. Relaxations cause fluctuations in other degrees of freedom such as bond lengths and bond angles, which the model was not trained on. So, if predicting the energy of relaxed structures is the goal some examples should be included in the training set.</p>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<ul>
+<li>The graphs and molecular graph kernel from GraphDot have enough resolution to tell the difference between torsional conformers of the same molecule</li>
+<li>Good energy predictions ($&lt;k_BT$) can be achieved on small datasets with the implemented graph kernel and GPR model</li>
+<li>Prediction uncertainties are very useful and a huge advantage of a GPR model. Chemistry or materials science problems where generating semi-realistic structures is easy but energy evaluations are expensive are most likely to fully leverage the advantages of GPR.</li>
+<li>If predicting the energy of relaxed structures is the objective, at least some relaxed structures should be included in the training dataset</li>
+<li>The algorithm presented here will not work for all molecular systems but I think everyone can appreciate the software integration :)</li>
+</ul>
+
+<h2 id="future-extensions">Future Extensions</h2>
+
+<ul>
+<li>Predicting structures — It would be nice to be able to predict low energy conformations. One way to do this is write an optimizer in ASE and use the GPR model as a surrogate for the energy calculation.</li>
+<li>Extrapolation to larger polymers — One potential way to extend the toy example I presented here is to predict the energy of a chain that is roughly the same size as the torsional correlation length. Beyond that length segments are uncorrelated and one might be able to extrapolate energy predictions to much larger polymers.</li>
+</ul>
+
+<h2 id="known-issues">Known Issues</h2>
+
+<ul>
+<li>The validation and test sets are potentially contaminated, because I did not account for the symmetry present in the example system.</li>
+<li>Energies were not calculated on-the-fly in the active learning loop. I did this to keep things simple, but there is no reason it couldn’t be done in the future.</li>
+</ul>
+
+    </div>
+
+    
+
+
+
+
+    
+
+
+
+  
+
+
+
+
+
+
+
+    
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2020 Brandon Wood &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    <script src="/js/academic.min.d037ee5294b166a79dec317c58aea9cc.js"></script>
+
+    
+
+  </body>
+</html>
+
