@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>2 on </title>
@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2020 Brandon Wood</copyright>
-    <lastBuildDate>Wed, 12 Feb 2020 00:00:00 -0800</lastBuildDate>
+    <lastBuildDate>Wed, 12 Feb 2020 00:00:00 -0600</lastBuildDate>
     
 	<atom:link href="https://wood-b.github.io/publication_types/2/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>Aromaticity as a Guide to Planarity in Conjugated Molecules and Polymers</title>
       <link>https://wood-b.github.io/publication/aromaticity_as_a_guide_to_planarity_in_conjugated_molecules_and_polymers/</link>
-      <pubDate>Wed, 12 Feb 2020 00:00:00 -0800</pubDate>
+      <pubDate>Wed, 12 Feb 2020 00:00:00 -0600</pubDate>
       
       <guid>https://wood-b.github.io/publication/aromaticity_as_a_guide_to_planarity_in_conjugated_molecules_and_polymers/</guid>
       <description></description>
@@ -24,7 +24,7 @@
     <item>
       <title>Conformational Entropy as a Means to Control the Behavior of Poly (diketoenamine) Vitrimers In and Out of Equilibrium</title>
       <link>https://wood-b.github.io/publication/conformational-entropy-vitrimers/</link>
-      <pubDate>Tue, 15 Oct 2019 00:00:00 -0700</pubDate>
+      <pubDate>Tue, 15 Oct 2019 00:00:00 -0500</pubDate>
       
       <guid>https://wood-b.github.io/publication/conformational-entropy-vitrimers/</guid>
       <description></description>
@@ -33,7 +33,7 @@
     <item>
       <title>Ion Transport and the True Transference Number in Nonaqueous Polyelectrolyte Solutions for Lithium-Ion Batteries</title>
       <link>https://wood-b.github.io/publication/ion-transport-polyelectrolyte-solutions/</link>
-      <pubDate>Fri, 14 Jun 2019 00:00:00 -0700</pubDate>
+      <pubDate>Fri, 14 Jun 2019 00:00:00 -0500</pubDate>
       
       <guid>https://wood-b.github.io/publication/ion-transport-polyelectrolyte-solutions/</guid>
       <description></description>
@@ -42,7 +42,7 @@
     <item>
       <title>Elucidating Solvation Structures for Rational Design of Multivalent Electrolytes — A Review</title>
       <link>https://wood-b.github.io/publication/elucidating-solvation-structures-for-rational-design-of-multivalent-electrolytes-a-review/</link>
-      <pubDate>Thu, 26 Apr 2018 00:00:00 -0700</pubDate>
+      <pubDate>Thu, 26 Apr 2018 00:00:00 -0500</pubDate>
       
       <guid>https://wood-b.github.io/publication/elucidating-solvation-structures-for-rational-design-of-multivalent-electrolytes-a-review/</guid>
       <description></description>
@@ -51,7 +51,7 @@
     <item>
       <title>The Interplay between Salt Association and the Dielectric Properties of Low Permittivity Electrolytes: The Case of LiPF6 and LiAsF6 in Dimethyl Carbonate</title>
       <link>https://wood-b.github.io/publication/the-interplay-between-salt-association-and-the-dielectric-properties-of-low-permittivity-electrolytes-the-case-of-lipf6-and-liasf6-in-dimethyl-carbonate/</link>
-      <pubDate>Wed, 20 Dec 2017 00:00:00 -0800</pubDate>
+      <pubDate>Wed, 20 Dec 2017 00:00:00 -0600</pubDate>
       
       <guid>https://wood-b.github.io/publication/the-interplay-between-salt-association-and-the-dielectric-properties-of-low-permittivity-electrolytes-the-case-of-lipf6-and-liasf6-in-dimethyl-carbonate/</guid>
       <description></description>
@@ -60,7 +60,7 @@
     <item>
       <title>Atomate: A High Level Interface to Generate, Execute, and Analyze Computational Materials Science Workflows</title>
       <link>https://wood-b.github.io/publication/atomate-a-high-level-interface-to-generate-execute-and-analyze-computational-materials-science-workflows/</link>
-      <pubDate>Fri, 04 Aug 2017 00:00:00 -0700</pubDate>
+      <pubDate>Fri, 04 Aug 2017 00:00:00 -0500</pubDate>
       
       <guid>https://wood-b.github.io/publication/atomate-a-high-level-interface-to-generate-execute-and-analyze-computational-materials-science-workflows/</guid>
       <description></description>

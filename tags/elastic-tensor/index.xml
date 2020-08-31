@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>elastic tensor on </title>
@@ -18,7 +18,7 @@
       <pubDate>Wed, 19 Dec 2018 11:28:58 -0800</pubDate>
       
       <guid>https://wood-b.github.io/project/elastic-tensor-ml/</guid>
-      <description>The Materials Project contains ~87,000 total materials with ~13,500 elastic tensors, which are computationally intensive to calculate from first principles. Although the total number computed will continue to grow, it would be nice to use the data we already have to predict elastic properties such as bulk and shear modulus for materials where the elastic tensor is yet to be calculated. As a result, the goals of this project are to compare machine learning (ML) models for predicting the bulk modulus, and to update the previous model that was trained on a smaller data set.</description>
+      <description>Machine learning models for predicting the bulk modulus of materials</description>
     </item>
     
   </channel>
