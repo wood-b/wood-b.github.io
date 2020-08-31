@@ -13,6 +13,16 @@
     
     
     <item>
+      <title>A Novice’s Guide to Hyperparameter Optimization at Scale</title>
+      <link>https://wood-b.github.io/post/a-novices-guide-to-hyperparameter-optimization-at-scale/</link>
+      <pubDate>Sun, 30 Aug 2020 23:08:53 -0500</pubDate>
+      
+      <guid>https://wood-b.github.io/post/a-novices-guide-to-hyperparameter-optimization-at-scale/</guid>
+      <description>TL;DR: Running HPO at scale is important and Ray Tune makes that easy. When considering what HPO strategies to use for your project, start by choosing a scheduler — it can massively improve performance — with random search and build complexity as needed. When in doubt, ASHA is a good default scheduler.
+Acknowledgements: I want to thank Zachary Ulissi (CMU), Mustafa Mustafa (NERSC), and Richard Liaw (Ray Tune) for making this work possible.</description>
+    </item>
+    
+    <item>
       <title>Active Learning Demo</title>
       <link>https://wood-b.github.io/post/active-learning-demo/</link>
       <pubDate>Fri, 10 Apr 2020 12:00:14 -0700</pubDate>

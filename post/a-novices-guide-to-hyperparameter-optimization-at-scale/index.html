@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 3.2.0">
+  <meta name="generator" content="Hugo 0.52" />
+  <meta name="author" content="Brandon Wood">
+
+  
+  
+  
+  
+    
+  
+  <meta name="description" content="TL;DR: Running HPO at scale is important and Ray Tune makes that easy. When considering what HPO strategies to use for your project, start by choosing a scheduler — it can massively improve performance — with random search and build complexity as needed. When in doubt, ASHA is a good default scheduler.
+Acknowledgements: I want to thank Zachary Ulissi (CMU), Mustafa Mustafa (NERSC), and Richard Liaw (Ray Tune) for making this work possible.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://wood-b.github.io/post/a-novices-guide-to-hyperparameter-optimization-at-scale/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous">
+        
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+  
+
+  
+  <link rel="alternate" href="https://wood-b.github.io/index.xml" type="application/rss+xml" title="">
+  <link rel="feed" href="https://wood-b.github.io/index.xml" type="application/rss+xml" title="">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://wood-b.github.io/post/a-novices-guide-to-hyperparameter-optimization-at-scale/">
+
+  
+  
+  
+  
+    
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="og:site_name" content="">
+  <meta property="og:url" content="https://wood-b.github.io/post/a-novices-guide-to-hyperparameter-optimization-at-scale/">
+  <meta property="og:title" content="A Novice’s Guide to Hyperparameter Optimization at Scale | ">
+  <meta property="og:description" content="TL;DR: Running HPO at scale is important and Ray Tune makes that easy. When considering what HPO strategies to use for your project, start by choosing a scheduler — it can massively improve performance — with random search and build complexity as needed. When in doubt, ASHA is a good default scheduler.
+Acknowledgements: I want to thank Zachary Ulissi (CMU), Mustafa Mustafa (NERSC), and Richard Liaw (Ray Tune) for making this work possible."><meta property="og:image" content="https://wood-b.github.io/post/a-novices-guide-to-hyperparameter-optimization-at-scale/featured.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2020-08-30T23:08:53-05:00">
+  
+  <meta property="article:modified_time" content="2020-08-30T23:08:53-05:00">
+  
+
+  
+
+  
+
+  <title>A Novice’s Guide to Hyperparameter Optimization at Scale | </title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/"></a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav ml-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#publications">
+            
+            <span>Publications</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/files/cv_website_feb2020.pdf">
+            
+            <span>CV</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="article-header d-xl-none">
+  <div class="featured-image" style="background-image: url('/post/a-novices-guide-to-hyperparameter-optimization-at-scale/featured_hu04da6d137531e721070876e73ee0c594_75335_800x0_resize_box_2.png');"></div>
+  
+</div>
+
+
+<div class="container-fluid split-header d-none d-xl-block">
+  <div class="row">
+    <div class="col-6">
+      <div class="split-header-content">
+        <h1 itemprop="name">A Novice’s Guide to Hyperparameter Optimization at Scale</h1>
+
+        
+
+        
+
+<div class="article-metadata">
+
+  
+  
+  
+  <div>
+    <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+      <span itemprop="name">Brandon M. Wood</span>
+    </span>
+    
+  </div>
+  
+
+  <span class="article-date">
+    
+    <meta content="2020-08-30 23:08:53 -0500 CDT" itemprop="datePublished">
+    <time datetime="2020-08-30 23:08:53 -0500 CDT" itemprop="dateModified">
+      Aug 30, 2020
+    </time>
+  </span>
+  <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Brandon Wood">
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    16 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+
+</div>
+
+
+        
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=A%20Novice%e2%80%99s%20Guide%20to%20Hyperparameter%20Optimization%20at%20Scale&amp;url=https%3a%2f%2fwood-b.github.io%2fpost%2fa-novices-guide-to-hyperparameter-optimization-at-scale%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwood-b.github.io%2fpost%2fa-novices-guide-to-hyperparameter-optimization-at-scale%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwood-b.github.io%2fpost%2fa-novices-guide-to-hyperparameter-optimization-at-scale%2f&amp;title=A%20Novice%e2%80%99s%20Guide%20to%20Hyperparameter%20Optimization%20at%20Scale"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwood-b.github.io%2fpost%2fa-novices-guide-to-hyperparameter-optimization-at-scale%2f&amp;title=A%20Novice%e2%80%99s%20Guide%20to%20Hyperparameter%20Optimization%20at%20Scale"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=A%20Novice%e2%80%99s%20Guide%20to%20Hyperparameter%20Optimization%20at%20Scale&amp;body=https%3a%2f%2fwood-b.github.io%2fpost%2fa-novices-guide-to-hyperparameter-optimization-at-scale%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="split-header-image">
+        <img src="/post/a-novices-guide-to-hyperparameter-optimization-at-scale/featured_hu04da6d137531e721070876e73ee0c594_75335_680x500_fill_q90_box_smart1_2.png" itemprop="image" alt="">
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="article-container d-xl-none">
+  <h1 itemprop="name">A Novice’s Guide to Hyperparameter Optimization at Scale</h1>
+
+  
+
+  
+
+<div class="article-metadata">
+
+  
+  
+  
+  <div>
+    <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+      <span itemprop="name">Brandon M. Wood</span>
+    </span>
+    
+  </div>
+  
+
+  <span class="article-date">
+    
+    <meta content="2020-08-30 23:08:53 -0500 CDT" itemprop="datePublished">
+    <time datetime="2020-08-30 23:08:53 -0500 CDT" itemprop="dateModified">
+      Aug 30, 2020
+    </time>
+  </span>
+  <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Brandon Wood">
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    16 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=A%20Novice%e2%80%99s%20Guide%20to%20Hyperparameter%20Optimization%20at%20Scale&amp;url=https%3a%2f%2fwood-b.github.io%2fpost%2fa-novices-guide-to-hyperparameter-optimization-at-scale%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwood-b.github.io%2fpost%2fa-novices-guide-to-hyperparameter-optimization-at-scale%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwood-b.github.io%2fpost%2fa-novices-guide-to-hyperparameter-optimization-at-scale%2f&amp;title=A%20Novice%e2%80%99s%20Guide%20to%20Hyperparameter%20Optimization%20at%20Scale"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwood-b.github.io%2fpost%2fa-novices-guide-to-hyperparameter-optimization-at-scale%2f&amp;title=A%20Novice%e2%80%99s%20Guide%20to%20Hyperparameter%20Optimization%20at%20Scale"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=A%20Novice%e2%80%99s%20Guide%20to%20Hyperparameter%20Optimization%20at%20Scale&amp;body=https%3a%2f%2fwood-b.github.io%2fpost%2fa-novices-guide-to-hyperparameter-optimization-at-scale%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+  
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p><strong>TL;DR:</strong> Running HPO at scale is important and <a href="https://docs.ray.io/en/latest/tune/index.html" target="_blank">Ray Tune</a> makes that easy. When considering what HPO strategies to use for your project, start by choosing a scheduler — it can massively improve performance — with random search and build complexity as needed. When in doubt, ASHA is a good default scheduler.</p>
+
+<p><strong>Acknowledgements:</strong>
+I want to thank <a href="https://ulissigroup.cheme.cmu.edu" target="_blank">Zachary Ulissi</a> (CMU), <a href="https://www.nersc.gov/about/nersc-staff/data-analytics-services/mustafa-mustafa/" target="_blank">Mustafa Mustafa</a> (NERSC), and <a href="https://github.com/richardliaw" target="_blank">Richard Liaw</a> (Ray Tune) for making this work possible.</p>
+
+<h2 id="table-of-contents">Table of Contents:</h2>
+
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#scalable-hpo-with-ray-tune">Scalable HPO with Ray Tune</a></li>
+<li><a href="#how-to-select-an-hpo-strategy">How to Select an HPO Strategy</a>
+
+<ul>
+<li><a href="#schedulers-vs-search-algorithms">Schedulers vs Search Algorithms</a></li>
+<li><a href="#time-to-solution-study">Time-to-Solution Study</a></li>
+<li><a href="#not-all-hyperparameters-can-be-treated-the-same">Not all Hyperparameters Can Be Treated the Same</a></li>
+<li><a href="#optimal-scheduling-with-pbt">Optimal Scheduling with PBT</a></li>
+<li><a href="#cheat-sheet-for-selecting-an-hpo-strategy">Cheat Sheet for Selecting an HPO Strategy</a></li>
+</ul></li>
+<li><a href="#technical-tips">Technical Tips</a>
+
+<ul>
+<li><a href="#ray-tune">Ray Tune</a></li>
+<li><a href="#dragonfly">Dragonfly</a></li>
+<li><a href="#slurm">Slurm</a></li>
+<li><a href="#tensorboard">TensorBoard</a></li>
+<li><a href="#weights-and-biases">Weights and Biases</a></li>
+</ul></li>
+<li><a href="#key-findings">Key Findings</a></li>
+<li><a href="#key-takeaways">Key Takeaways</a></li>
+</ul>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Despite the tremendous success of machine learning (ML), modern algorithms still depend on a variety of free non-trainable hyperparameters. Ultimately, our ability to select quality hyperparameters governs the performance for a given model.  In the past, and even some currently, hyperparameters were hand selected through trial and error. An entire field has been dedicated to improving this selection process; it is referred to as hyperparameter optimization (HPO). Inherently, HPO requires testing many different hyperparameter configurations and as a result can benefit tremendously from massively parallel resources like the <a href="https://www.nersc.gov/systems/perlmutter/" target="_blank">Perlmutter system</a> we are building at the National Energy Research Scientific Computing Center (<a href="https://www.nersc.gov" target="_blank">NERSC</a>). As we prepare for Perlmutter, we wanted to explore the multitude of HPO frameworks and strategies that exist on a model of interest. This article is a product of that exploration and is intended to provide an introduction to HPO methods and guidance on running HPO at scale based on my recent experiences and results.</p>
+
+<p>Disclaimer; this article contains plenty of general non-software specific information about HPO, but there is a bias for free open source software that is applicable to our systems at NERSC.</p>
+
+<h2 id="scalable-hpo-with-ray-tune">Scalable HPO with Ray Tune</h2>
+
+<p>Being able to leverage the power of modern compute resources to run HPO at scale is important to efficiently search hyperparameter space — especially in the time of deep learning (DL) where the size of neural networks continues to increase. Luckily for all of us, the folks at <a href="https://docs.ray.io/en/latest/tune/index.html" target="_blank">Ray Tune</a> have made scalable HPO easy. Below is a graphic of the general procedure to run Ray Tune at NERSC. <a href="https://docs.ray.io/en/latest/tune/index.html" target="_blank">Ray Tune</a> is an open-source python library for distributed HPO built on Ray. Some highlights of Ray Tune:
+- Supports any ML framework
+- Internally handles job scheduling based on the resources available
+- Integrates with external optimization packages (e.g. Ax, Dragonfly, HyperOpt, SigOpt)
+- Implements state-of-the-art schedulers (e.g. ASHA, AHB, PBT)</p>
+
+<p>I have enjoyed using <a href="https://docs.ray.io/en/latest/tune/index.html" target="_blank">Ray Tune</a>, but if you choose a different HPO framework, no worries, there is still plenty of general information in this article.</p>
+
+<p><img src="tune_flow.png" alt="tune" /></p>
+
+<h2 id="how-to-select-an-hpo-strategy">How to Select an HPO strategy</h2>
+
+<h3 id="schedulers-vs-search-algorithms">Schedulers vs Search Algorithms</h3>
+
+<p>One of the first distinctions I want to point out about HPO strategies, is the difference between a scheduler and a search algorithm. The search algorithm governs how hyperparameter space is sampled and optimized (e.g. random search). From a practical standpoint, the search algorithm provides a mechanism to select hyperparameter configurations (i.e. trials) to test. A search algorithm is always necessary for HPO. Alternatively, schedulers improve the overall efficiency of the HPO by terminating unpromising trials early. For example, if I use random search, some of the trials are expected to perform poorly, so it would be nice to have the ability to terminate those trials early — saving valuable compute resources. This is what a scheduler does. A scheduler is not necessary for HPO but they massively improve performance. Below are brief descriptions and references for the schedulers and the search algorithms I tested.</p>
+
+<h4 id="async-successive-halving-algorithm-asha-scheduler">Async Successive Halving Algorithm (ASHA — scheduler)</h4>
+
+<p>First, I want to define the successive halving algorithm (SHA), and instead of doing it myself, I really like the definition given in this <a href="https://arxiv.org/pdf/1810.05934.pdf" target="_blank">paper</a> — they also have pseudocode of the SHA and ASHA, if you are interested.</p>
+
+<blockquote>
+<p>The idea behind SHA is simple: allocate a small budget to each configuration, evaluate all configurations and keep the top 1/η, increase the budget per configuration by a factor of η, and repeat until the maximum per-configuration budget of R is reached.</p>
+</blockquote>
+
+<p><img src="sha.gif" alt="sha" /></p>
+
+<p>This graphic was adapted from an AutoML <a href="https://www.automl.org/blog_bohb/" target="_blank">post</a>.</p>
+
+<p>The SHA does not parallelize well because all configurations need to be evaluated for a short time before the top 1/η can be selected. This creates a bottleneck at each rung (each successive halving is referred to as a rung). ASHA decouples trial promotion and rung completion, such that trials can be advanced to the next rung at any given time. If a trial cannot be promoted additional trials can be added to the base rung so more promotions are possible.</p>
+
+<p>A major assumption of SHA and ASHA is that if a trial performs well over an initial short time interval it will perform well at longer time intervals. A classic example where this assumption can break down is tuning learning rates. Larger learning rates may outperform smaller learning rates at short times causing the smaller learning rate trials to be erroneously terminated. In practice, I am honestly not sure how much this matters.</p>
+
+<h4 id="async-hyperband-ahb-scheduler">Async Hyperband (AHB — scheduler)</h4>
+
+<p><a href="https://arxiv.org/pdf/1603.06560.pdf" target="_blank">Hyperband</a> (HB) is a scheduler designed to mitigate the SHA&rsquo;s bias towards initial performance. HB essentially loops over the SHA with a variety of halving rates — attempting to balance early termination with providing more resources per trial regardless of initial performance. Each loop of the SHA is considered a bracket, which can have a number of rungs. See the figure below. AHB is identical to HB except it loops over ASHA. The AHB and ASHA implementation used in Ray Tune is described in this <a href="https://arxiv.org/pdf/1810.05934.pdf" target="_blank">paper</a>.</p>
+
+<p><img src="hb_ladder.png" alt="hb" /></p>
+
+<h4 id="population-based-training-pbt-hybrid">Population Based Training (PBT — hybrid)</h4>
+
+<p>I call PBT a hybrid because it has aspects of both a scheduler and a search algorithm. It can also function as an HPO strategy and a trainer all-in-one. More on that in the Not all Hyperparameters Are the Same section. At a high-level, PBT is similar to a genetic algorithm. There is a population of workers, where each worker is assigned a random configuration of hyperparameters (trial) and at set intervals hyperparameter configurations are replaced by higher performing workers in the population (exploitation) and randomly perturbed (exploration). The user can set the balance of exploitation vs exploration. Here are a couple resources to learn more, <a href="https://deepmind.com/blog/article/population-based-training-neural-networks" target="_blank">blog</a> and <a href="https://arxiv.org/pdf/1711.09846.pdf" target="_blank">paper</a>.</p>
+
+<p><img src="pbt_example.png" alt="pbt" /></p>
+
+<h4 id="random-search-rs-search-algorithm">Random Search (RS — search algorithm)</h4>
+
+<p>When the hyperparameter space of interest is reasonably large, too large for a grid search, the default algorithm is random search. This is exactly as it sounds, hyperparameter configurations or trials are randomly selected from the search space. If given enough compute time RS works reasonably well.</p>
+
+<h4 id="bayesian-optimization-bo-search-algorithm">Bayesian Optimization (BO — search algorithm)</h4>
+
+<p>BO provides an algorithmic approach to determining the optimal hyperparameters, instead of randomly searching. Because the objective function is unknown in HPO a black-box optimizer like BO is necessary. In BO a surrogate models the objective function and an acquisition function is used for sampling new points or new hyperparameter configurations in this case. Gaussian processes are typically used as the surrogate models in BO for HPO. Ideally, BO can converge towards the optimal hyperparameters much more efficiently than random search.</p>
+
+<h3 id="time-to-solution-study">Time-to-Solution Study</h3>
+
+<p>To compare different HPO strategies I decided to keep it simple and focus on the average time-to-solution, which is a metric that is relatively straightforward to interpret. There are a couple caveats for my results:</p>
+
+<ol>
+<li>I did this work with a particular model and problem in mind (more on that below), so I do not expect these results to be completely general.</li>
+<li>There are many arbitrary choices that go into various HPO strategies that may alter the results.<br /></li>
+</ol>
+
+<h4 id="model-details">Model details</h4>
+
+<p>The model I was interested in optimizing hyperparameters for is a graph neural network used in the field of catalysis to predict adsorption energies. Specific details can be found <a href="https://doi.org/10.1021/acs.jpclett.9b01428" target="_blank">here</a>.</p>
+
+<h4 id="hyperparameters">Hyperparameters</h4>
+
+<p>There were six hyperparameters I examined and they are listed below:</p>
+
+<ul>
+<li>Learning Rate</li>
+<li>Batch Size</li>
+<li>Atom Embedding Size</li>
+<li>Number of Graph Convolution Layers</li>
+<li>Fully Connected Feature Size</li>
+<li>Number of Fully Connected Layers</li>
+</ul>
+
+<p><strong>Pro Tip:</strong> When making decisions about the size of the hyperparameter space you want to search — consider memory usage. When tuning network architecture and batch size I ran into memory issues on our 16GB GPUs at NERSC.</p>
+
+<h4 id="questions-explored">Questions Explored</h4>
+
+<ol>
+<li>What is the impact of a scheduler?</li>
+<li>How much can a sophisticated search algorithm improve HPO?</li>
+</ol>
+
+<p>The first question I wanted to investigate was the impact of using a scheduler. To address this question I compared the time-to-solution of ASHA/RS, AHB/RS, and RS using the same computational resources for each (4 Cori GPU Nodes for 8 hours). All three strategies use the same search algorithm with the addition of the ASHA and the AHB schedulers. The notation I am using is scheduler/search algorithm.</p>
+
+<p>Going beyond a scheduler, I was curious how much a &ldquo;smarter&rdquo; search algorithm, such as BO, would improve HPO performance. To explore this question I compared the time-to-solution of ASHA/RS and ASHA/BO using the same computational resources for each (4 Cori GPU Nodes for 4 hours).</p>
+
+<h4 id="results-and-discussion">Results and Discussion</h4>
+
+<h5 id="average-time-to-solution-plot-comparing-asha-rs-ahb-rs-and-rs-given-the-same-computational-resources">Average time-to-solution plot comparing ASHA/RS, AHB/RS, and RS given the same computational resources</h5>
+
+<p><img src="hpo_8hr_compare_asha_ahb_rs_std_abrev.png" alt="fig1" /></p>
+
+<p>ASHA/RS clearly outperformed both AHB/RS and RS by reaching a lower average test MAE in a shorter period of time. ASHA/RS improved the time-to-solution by at least 5x compared to RS. I say at least 5x, because RS did not converge to the lower limit of the test MAE in the 8 hour limit. Additionally, more ASHA/RS trials were close to the mean resulting in a smaller standard deviation. The top 6 trials were time averaged in all cases. I suspect the performance of ASHA/RS is largely because of the number of trials completed. ASHA/RS finished nearly 2x the trials of AHB/RS and over 8x the trials of RS. The number of trials finished can be seen in the top right corner. I should also mention that the number of ASHA/RS and AHB/RS trials are not at their upper limit because of the amount of checkpoint I was doing. <strong>Minimal checkpointing is critical for the performance of SHA based HPO strategies.</strong> This is illustrated by the number of trials finished in the ASHA/RS experiment below that used less checkpointing — the same amount of trials in half the time. The reduced checkpointing increased the time-to-solution improvement for ASHA/RS to approximately 10x compared to RS!</p>
+
+<h5 id="average-time-to-solution-plot-comparing-asha-rs-and-asha-bo-given-the-same-computational-resources">Average time-to-solution plot comparing ASHA/RS and ASHA/BO given the same computational resources</h5>
+
+<p><img src="hpo_4hr_compare_asha_rs_asha_bo_std.png" alt="fig2" /></p>
+
+<p>It can be seen from the figure above that there is on average no benefit to adding BO for my particular model. My hypothesis is that the hyperparameter surface I was trying to optimize had a bunch of local minima (think egg carton) and no obvious global minimum, which would reduce the benefit of BO. Situations where I can see BO working well are large hyperparameter search spaces with a more well defined global minimum — not that you can know this <em>a priori</em>. Overall, I think a good approach to HPO is building complexity as needed. One last note on BO, while there was not an average improvement using BO the single best trial I found was using ASHA/BO. As a result, if I had to choose one configuration of hyperparameters that is what I would select.</p>
+
+<p>The time delay between the ASHA/RS and the ASHA/BO curves is likely because the acquisition function used in BO needs to be conditioned with a certain amount of data before sampling new hyperparameter configurations.</p>
+
+<h3 id="not-all-hyperparameters-can-be-treated-the-same">Not all Hyperparameters Can Be Treated the Same</h3>
+
+<p>There are two main types of hyperparameters in ML and they dictate what HPO strategies are possible.</p>
+
+<p><strong>Model Hyperparameters:</strong> Establish model architecture</p>
+
+<ul>
+<li>Number of convolutional layers</li>
+<li>Number of fully connected layers</li>
+<li>etc.</li>
+</ul>
+
+<p><strong>Algorithm Hyperparameters:</strong> Are involved in the learning process</p>
+
+<ul>
+<li>Learning rates</li>
+<li>Batch size</li>
+<li>Momentum</li>
+<li>etc.</li>
+</ul>
+
+<p>The important takeaway is that not all HPO strategies can handle both model and algorithm hyperparameters. PBT is a good example. PBT was designed to evolve and inherit hyperparameters from other high performing workers in the population; however, if workers have different network architectures it is unclear to me how exactly that would work. There might be a way to do this with PBT, but it is not standard and does not work out-of-the-box with Ray Tune.</p>
+
+<h3 id="optimal-scheduling-with-pbt">Optimal Scheduling with PBT</h3>
+
+<p>One of the nice features of PBT is the ability to develop an ideal scheduling procedure. For instance, I can determine the ideal learning rate throughout training, which is usually quite important. In my case, I want a configuration of hyperparameters and a learning rate scheduler that I can use to train my model repeatedly. Most ML frameworks include learning rate schedulers (e.g. multistep, reduce on plateau, exponential decay, etc.) to reduce the learning rate as training progresses. Hence, a custom learning rate scheduler can be developed using PBT and incorporated into a given ML framework for subsequent training.</p>
+
+<p>Alternatively, if repeated training is not necessary for your application PBT can be used directly as a training procedure and ideal schedules can be developed for all algorithm hyperparameters simultaneously.</p>
+
+<p>Training with PBT is very efficient in terms of actual time, in fact it uses roughly the same amount of time as your normal training procedure, but total computational time goes up because multiple workers are necessary — maybe 16 - 32 GPUs. In Ray Tune, workers can also be time-multiplexed if the number of workers exceeds the resource size.</p>
+
+<h4 id="optimal-learning-rate-results-and-discussion">Optimal Learning Rate — Results and Discussion</h4>
+
+<p>I wanted to experiment with PBT and find a learning rate schedule for my model (described above). Here are the results.</p>
+
+<p><img src="pbt_best_trial_lr.png" alt="pbt" /></p>
+
+<p>The top plot shows the Test MAE for the best trial in the population. There are some jumps in the Test MAE where presumably random perturbations were attempted and since there was not an improvement the perturbations were ultimately reversed. The lower plot displays the learning rate as a function of training iterations. It appears that my ideal learning rate could reasonably be modeled by a multistep scheduler.</p>
+
+<h3 id="cheat-sheet-for-selecting-an-hpo-strategy">Cheat Sheet for Selecting an HPO Strategy</h3>
+
+<p>Choosing an HPO strategy really depends on your particular application. For many of the chemistry and materials science applications that I am interested in, reasonably good hyperparameters that get us 85% of the way there will do just fine. Alternatively, some of you might be interested in squeezing out every last drop of performance for a given model. There is not a one-size-fits-all solution, but I&rsquo;ve put together a little cheat sheet to help get the ideas flowing.</p>
+
+<p><img src="hpo_cheat_sheet.png" alt="cheat_sheet" /></p>
+
+<h2 id="technical-tips">Technical Tips</h2>
+
+<h3 id="ray-tune">Ray Tune</h3>
+
+<p>Ray Tune is very user friendly and you only need to consider a few things when setting it up to run your model (I am not going to go in-depth here because Ray Tune&rsquo;s <a href="https://docs.ray.io/en/latest/tune/index.html" target="_blank">documentation</a> and <a href="https://github.com/ray-project/ray/tree/master/python/ray/tune/examples" target="_blank">examples</a> are great):
+1. Define a trainable API, either function or class based — I recommend the class option as it allows you do much more
+2. Write a script to run Tune via <code>tune.run()</code></p>
+
+<h4 id="general-tips">General Tips</h4>
+
+<ul>
+<li>Check to ensure your model is being put on the right device, this sounds silly but it&rsquo;s worthwhile. Put a print statement in your <code>_setup</code> function, if you are using the class API, to double check<br /></li>
+<li>Ray Tune has a bunch of handy <a href="https://docs.ray.io/en/master/tune/api_docs/grid_random.html#custom-conditional-search-spaces" target="_blank">functions</a> (e.g. <code>tune.uniform</code>) to generate random distributions</li>
+</ul>
+
+<h4 id="tune-run-flags-for-performance"><code>Tune.run()</code> Flags for Performance</h4>
+
+<ul>
+<li><code>checkpoint_at_end=False</code> Default is False and I would leave it that way regardless of other checkpointing settings. True, should never be used with SHA based strategies</li>
+<li><code>sync_on_checkpoint=False</code> This can improve performance but maybe only marginally — it depends on how frequently you are checkpointing</li>
+<li><code>fail_fast=True</code> I like this flag because it kills a trial immediately after it fails, otherwise the trial can go through all training iterations where it fails each iteration</li>
+<li><code>reuse_actors=True</code> This flag can improve performance on both ASHA and PBT but it requires you to add a <code>reset_config</code> function to your trainable class. In part, this flag can save time by not reloading your dataset everytime an old trial is terminated and a new trial begins.</li>
+</ul>
+
+<h3 id="dragonfly-bo">Dragonfly — BO</h3>
+
+<p>I like <a href="https://github.com/dragonfly/dragonfly" target="_blank">Dragonfly</a> for Bayesian Optimization because of its ability to work with both discrete and continuous variables. Many BO packages only work with continuous variables and you have to hack your way around that issue. Nevertheless, I did find it a bit tricky to actually define the hyperparameter space. Below is the code snippet I used to set up Dragonfly BO for use with Ray Tune.</p>
+
+<pre><code class="language-python">param_list = [{&quot;name&quot;: &quot;atom_embedding_size&quot;,
+                &quot;type&quot;: &quot;int&quot;,
+                &quot;min&quot;: 1,
+                &quot;max&quot;: 100},
+              {&quot;name&quot;: &quot;num_graph_conv_layers&quot;,
+                &quot;type&quot;: &quot;int&quot;,
+                &quot;min&quot;: 1,
+                &quot;max&quot;: 40},
+              {&quot;name&quot;: &quot;fc_feat_size&quot;,
+                &quot;type&quot;: &quot;int&quot;,
+                &quot;min&quot;: 1,
+                &quot;max&quot;: 150},
+              {&quot;name&quot;: &quot;num_fc_layers&quot;,
+                &quot;type&quot;: &quot;int&quot;,
+                &quot;min&quot;: 1,
+                &quot;max&quot;: 40},
+              {&quot;name&quot;: &quot;lr&quot;,
+                &quot;type&quot;: &quot;float&quot;,
+                &quot;min&quot;: 0.001,
+                &quot;max&quot;: 0.1},
+              {&quot;name&quot;: &quot;batch_size&quot;,
+               &quot;type&quot;: &quot;discrete_numeric&quot;,
+               &quot;items&quot;:&quot;40-61-79-102-120-141-163-183-201-210-225-238&quot;}]
+
+    param_dict = {&quot;name&quot;: &quot;BO_CGCNN&quot;, &quot;domain&quot;: param_list}
+    domain_config = load_config(param_dict)
+    domain, domain_orderings = domain_config.domain, domain_config.domain_orderings
+
+    # define the hpo search algorithm BO
+    func_caller = CPFunctionCaller(None, domain, domain_orderings=domain_orderings)
+    optimizer = CPGPBandit(func_caller, ask_tell_mode=True)
+    bo_search_alg = DragonflySearch(optimizer, metric=&quot;validation_mae&quot;, mode=&quot;min&quot;)
+</code></pre>
+
+<h3 id="slurm-job-management">Slurm — Job Management</h3>
+
+<p>For those using Slurm, as we do at NERSC, <a href="https://github.com/NERSC/slurm-ray-cluster" target="_blank">here</a> are the scripts that enable the use of Ray Tune. The <code>start-head.sh</code> and <code>start-worker.sh</code> files can be copied directly; only the submit script requires minor modifications to execute your code on the resource and in the environment of choice. If you run into an issue where worker nodes are not starting and you see an error like this <code>ValueError: The argument None must be a bytes object</code> extend the sleep time after starting the head node found on this <a href="https://github.com/NERSC/slurm-ray-cluster/blob/master/submit-ray-cluster.sbatch#L36" target="_blank">line</a>. This is not a bug — the head node needs to set a variable and sometimes it takes a while.</p>
+
+<h3 id="tensorboard-logging-visualization">TensorBoard — Logging/Visualization</h3>
+
+<p>Ray Tune logs with TensorBoard (TB) by default. A couple thoughts about HPO with TB and Ray Tune:
+* TB allows you to easily filter your results, which is important when you run 1000s of trials using ASHA
+* Good visualizations with the <a href="https://www.tensorflow.org/tensorboard/hyperparameter_tuning_with_hparams" target="_blank">HParams Dashboard</a>
+* TB works great with SHA based strategies in Ray Tune, my only complaint is the integration with PBT is not as good</p>
+
+<p>For NERSC users <a href="https://docs.nersc.gov/machinelearning/tensorboard/" target="_blank">here</a> is how I usually run TB. One downside is that you can only have one TB client open at a time.</p>
+
+<h3 id="weights-and-biases-logging-visualization">Weights and Biases — Logging/Visualization</h3>
+
+<p>W&amp;B has a <a href="https://docs.wandb.com/library/integrations/ray-tune" target="_blank">logger</a> that integrates with Ray Tune and I used it with the model I was testing. Clearly a lot of potential exists and in general I like the W&amp;B platform, but at the time (March/April 2020) I had difficulties logging large-scale HPO campaigns with W&amp;B. I believe some updates/upgrades are in progress.</p>
+
+<h2 id="key-findings">Key Findings</h2>
+
+<ol>
+<li>The ASHA scheduler improved the time-to-solution for my model by at least 10x compared to random search alone</li>
+<li>BO may not always improve average HPO performance, but I was able to find my single best configuration of hyperparameters with ASHA/BO</li>
+<li>Using PBT, I found my optimal learning rate and it can be reasonably modeled with a multistep scheduler</li>
+</ol>
+
+<h2 id="key-takeaways">Key Takeaways</h2>
+
+<ol>
+<li>Ray Tune is a simple and scalable HPO framework</li>
+<li>Using a scheduler to improve HPO efficiency is essential</li>
+<li>More sophisticated search algorithms such as BO likely provide some benefit but are not always worth the investment<br /></li>
+<li>PBT is great for developing ideal schedulers and for training if the model does not need to be retained frequently</li>
+<li>There is no one-size-fits-all solution to HPO. Start simple and build complexity as needed — ASHA/RS is a reasonable default strategy</li>
+</ol>
+
+    </div>
+
+    
+
+
+
+
+    
+
+
+
+  
+
+
+
+
+
+
+
+    
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2020 Brandon Wood &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    <script src="/js/academic.min.d037ee5294b166a79dec317c58aea9cc.js"></script>
+
+    
+
+  </body>
+</html>
+
