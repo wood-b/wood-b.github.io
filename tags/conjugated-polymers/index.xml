@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Conjugated Polymers on </title>
@@ -18,7 +18,8 @@
       <pubDate>Wed, 19 Dec 2018 11:28:58 -0800</pubDate>
       
       <guid>https://wood-b.github.io/project/conjugated-polymers/</guid>
-      <description>In macromolecules, there are numerous examples where structure dictates function including electronic conductivity of conjugated polymer materials. To elucidate the structure of doped and excited conjugated polymers we developed a multiscale model that captures electronic structure rearrangement and stochastically generates polymer chain conformations.</description>
+      <description>In macromolecules, there are numerous examples where structure dictates function including electronic conductivity of conjugated polymer materials. To elucidate the structure of doped and excited conjugated polymers we developed a multiscale model that captures electronic structure rearrangement and stochastically generates polymer chain conformations.
+Two forthcoming publications will expand upon the impact of doping and excitation on conjugated polymer structure and the model/code (see above) used to generate chain conformations. Please check back early in the new year for updates.</description>
     </item>
     
   </channel>

@@ -1,12 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
-    
-    <url>
-    
-      <loc>https://wood-b.github.io/</loc>
-      <lastmod>2020-04-10T12:00:14-07:00</lastmod>
-    </url>
-    
   
     
     <url>
@@ -19,23 +12,7 @@
     
     <url>
     
-      <loc>https://wood-b.github.io/publication_types/2/</loc>
-      <lastmod>2020-02-12T00:00:00-06:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
       <loc>https://wood-b.github.io/publication/aromaticity_as_a_guide_to_planarity_in_conjugated_molecules_and_polymers/</loc>
-      <lastmod>2020-02-12T00:00:00-06:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://wood-b.github.io/publication_types/</loc>
       <lastmod>2020-02-12T00:00:00-06:00</lastmod>
     </url>
     
@@ -59,48 +36,8 @@
     
     <url>
     
-      <loc>https://wood-b.github.io/tags/high-throughput/</loc>
-      <lastmod>2018-12-19T14:15:49-08:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
       <loc>https://wood-b.github.io/project/high-throughput-chemistry/</loc>
       <lastmod>2018-12-19T14:15:49-08:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://wood-b.github.io/tags/open-source-software/</loc>
-      <lastmod>2018-12-19T14:15:49-08:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://wood-b.github.io/project/</loc>
-      <lastmod>2018-12-19T14:15:49-08:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://wood-b.github.io/tags/</loc>
-      <lastmod>2018-12-19T14:15:49-08:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://wood-b.github.io/tags/conjugated-polymers/</loc>
-      <lastmod>2018-12-19T11:28:58-08:00</lastmod>
     </url>
     
   
@@ -115,23 +52,7 @@
     
     <url>
     
-      <loc>https://wood-b.github.io/tags/elastic-tensor/</loc>
-      <lastmod>2018-12-19T11:28:58-08:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
       <loc>https://wood-b.github.io/project/elastic-tensor-ml/</loc>
-      <lastmod>2018-12-19T11:28:58-08:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://wood-b.github.io/tags/machine-learning/</loc>
       <lastmod>2018-12-19T11:28:58-08:00</lastmod>
     </url>
     
@@ -187,7 +108,107 @@
     
     <url>
     
+      <loc>https://wood-b.github.io/</loc>
+      <lastmod>2017-10-15T00:00:00-05:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://wood-b.github.io/publication_types/2/</loc>
+      <lastmod>2020-02-12T00:00:00-06:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://wood-b.github.io/categories/</loc>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://wood-b.github.io/tags/conjugated-polymers/</loc>
+      <lastmod>2018-12-19T11:28:58-08:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://wood-b.github.io/project/</loc>
+      <lastmod>2018-12-19T14:15:49-08:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://wood-b.github.io/publication_types/</loc>
+      <lastmod>2020-02-12T00:00:00-06:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://wood-b.github.io/tags/</loc>
+      <lastmod>2018-12-19T11:28:58-08:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://wood-b.github.io/tags/elastic-tensor/</loc>
+      <lastmod>2018-12-19T11:28:58-08:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://wood-b.github.io/tags/high-throughput/</loc>
+      <lastmod>2018-12-19T14:15:49-08:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://wood-b.github.io/tags/machine-learning/</loc>
+      <lastmod>2018-12-19T11:28:58-08:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://wood-b.github.io/tags/machine-learning/</loc>
+      <lastmod>2018-12-19T11:28:58-08:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://wood-b.github.io/tags/open-source-software/</loc>
+      <lastmod>2018-12-19T14:15:49-08:00</lastmod>
+      <priority>0</priority>
     </url>
     
   

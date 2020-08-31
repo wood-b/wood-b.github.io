@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>open source software on </title>
@@ -18,7 +18,7 @@
       <pubDate>Wed, 19 Dec 2018 14:15:49 -0800</pubDate>
       
       <guid>https://wood-b.github.io/project/high-throughput-chemistry/</guid>
-      <description>Open source python packages for automating molecular workflows</description>
+      <description>With the rise of modern high performance computers, it is possible to run quantum and classical simulations in automated high-throughput fashion. I have contributed to a number of open source repositories that enable high-throughput chemistry and materials science. The software stack includes: pymatgen, custodian, and atomate. Check out our atomate publication.</description>
     </item>
     
   </channel>
